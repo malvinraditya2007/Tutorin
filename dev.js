@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
+import { existsSync } from "node:fs";
 
 const root = process.cwd();
 const serverDir = resolve(root, "server");
@@ -17,10 +18,14 @@ const server = spawn(
   }
 );
 
-// Jalankan Vite Frontend
+// Jalankan Vite Frontend (dukung node_modules di root maupun di client)
+const viteBin = existsSync(resolve(clientDir, "node_modules/vite/bin/vite.js"))
+  ? resolve(clientDir, "node_modules/vite/bin/vite.js")
+  : resolve(root, "node_modules/vite/bin/vite.js");
+
 const client = spawn(
   process.execPath,
-  [resolve(clientDir, "node_modules/vite/bin/vite.js"), "--clearScreen", "false"],
+  [viteBin, "--clearScreen", "false"],
   {
     cwd: clientDir,
     stdio: ["inherit", "pipe", "inherit"],
